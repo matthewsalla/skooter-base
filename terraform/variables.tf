@@ -22,6 +22,11 @@ variable "gateway_ip" {
   description = "IP address of the Gateway (typically the router)"
 }
 
+variable "k3s_public_domain" {
+  type        = string
+  description = "Public domain of the K3s Cluster"
+}
+
 variable "host_ip" {
   type        = string
   description = "IP address of the Host"
