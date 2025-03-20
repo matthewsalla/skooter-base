@@ -26,7 +26,6 @@ CONTROL_PLANE_IP=$(echo "$TFVARS_JSON" | jq -r '
   | map(select(.key | test("control-plane")))
   | .[0].value.ip_address
 ')
-# CONTROL_PLANE_IP=$(echo "$TFVARS_JSON" | jq -r '.k3s_nodes["atlasmalt-control-plane"].ip_address')
 
 if [[ -z "$CONTROL_PLANE_IP" || "$CONTROL_PLANE_IP" == "null" ]]; then
   echo "Error: Control plane IP not found in $TFVARS_FILE."

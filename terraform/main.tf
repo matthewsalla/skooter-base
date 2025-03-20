@@ -80,6 +80,7 @@ resource "libvirt_cloudinit_disk" "commoninit" {
     cluster_private_key = tls_private_key.cluster_key.private_key_pem
     cluster_public_key   = tls_private_key.cluster_key.public_key_openssh
     hostname   = each.value.hostname
+    k3s_domain   = var.k3s_public_domain
     node_type    = each.value.cloud_init  # "control-plane" or "worker-node"
     control_ip = local.control_plane_nodes[0].ip_address
     longhorn_disk_size  = each.value.longhorn_disk_size
