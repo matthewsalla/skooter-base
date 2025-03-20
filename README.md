@@ -12,7 +12,7 @@ This repository contains the **shared base infrastructure and Kubernetes tooling
 - 💾 Longhorn automation utilities  
 - 🧩 Modular Helm-based app install scripts
 
-The goal is to **centralize reusable logic**, while thin repos (e.g., `telossphere-infra`, `msi-laptop-infra`) handle environment-specific overrides like `values.yaml`, secrets, domain names, and organizational logic.
+The goal is to **centralize reusable logic**, while thin repos (e.g., `example-infra`, `msi-laptop-infra`) handle environment-specific overrides like `values.yaml`, secrets, domain names, and organizational logic.
 
 ---
 
@@ -42,11 +42,11 @@ git submodule update --remote base
 
 ## 🚀 Cloning Thin Repos with Base Included
 
-If you're cloning a thin repo (like `telossphere-infra` or `msi-laptop-infra`), you **must use the recursive flag** to pull the base submodule:
+If you're cloning a thin repo (like `example-infra` or `msi-laptop-infra`), you **must use the recursive flag** to pull the base submodule:
 
 ```bash
 # ✅ Correct
-git clone --recursive https://github.com/yourusername/telossphere-infra.git
+git clone --recursive https://github.com/yourusername/example-infra.git
 
 # 🛑 If you forget:
 git submodule update --init --recursive
