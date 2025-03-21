@@ -1,7 +1,3 @@
-Here's a simple and clear `README.md` you can place in the root of your `skooter-base` repo:
-
----
-
 ```markdown
 # 🛠️ Skooter Base Repo
 
@@ -59,7 +55,3 @@ git submodule update --init --recursive
 - Store thin repo-specific configuration (like `.env`, `terraform.tfvars`, and sealed secrets) **in the thin repo**, not here.
 - Scripts in `skooter-base` will expect a `THIN_ROOT` environment variable when called from the thin repo. This allows them to find `.env` and secrets reliably across repo boundaries.
 - You can safely call scripts like `longhorn-automation.sh` manually, or have them orchestrated by thin repo deploy flows.
-
----
-
-Happy Kuberneting! 🚀
