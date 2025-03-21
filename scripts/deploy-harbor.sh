@@ -29,10 +29,10 @@ echo "🔐 Restoring Data Volume..."
 echo "✅ Persistent Data Volume Restored!"
 
 # Deploy Harbor.io App
-helm dependency update "$HELM_CHARTS_PATH/charts/harbor"
-helm upgrade --install harbor "$HELM_CHARTS_PATH/charts/harbor" \
+helm dependency update "$HELM_CHARTS_PATH/harbor"
+helm upgrade --install harbor "$HELM_CHARTS_PATH/harbor" \
   --namespace harbor \
-  --values "$HELM_VALUES_PATH/values/harbor-values.yaml"
+  --values "$HELM_VALUES_PATH/harbor-values.yaml"
 
 
 echo "✅ Harbor.io Deployed Successfully!"
