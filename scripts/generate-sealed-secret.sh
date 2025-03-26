@@ -44,8 +44,8 @@ EOF
 
 # Seal the secret using kubeseal
 kubeseal --format yaml \
-  --cert=../secrets/sealed-secret-controller-cert.pem \
-  < temp-secret.yaml > "../secrets/$SECRET_NAME-sealed-secret.yaml"
+  --cert=./secrets/sealed-secret-controller-cert.pem \
+  < temp-secret.yaml > "./secrets/$SECRET_NAME-sealed-secret.yaml"
 
 rm temp-secret.yaml
-echo "✅ Created: ../secrets/$SECRET_NAME-sealed-secret.yaml"
+echo "✅ Created: ./secrets/$SECRET_NAME-sealed-secret.yaml"
