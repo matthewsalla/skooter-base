@@ -8,5 +8,5 @@ terraform {
 }
 
 provider "libvirt" {
-  uri = "qemu+ssh://${var.libvirt_user}@${var.host_ip}/system"
+  uri = "qemu+ssh://${var.libvirt_user}@${var.host_ip}/system?no_verify=1"
 }
