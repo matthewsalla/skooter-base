@@ -31,10 +31,6 @@ kubectl create namespace gitea || true
 echo "🏷️  Labeling node for Gitea..."
 kubectl label node ${GITEA_NODE_NAME} dedicated=gitea --overwrite
 
-# echo "Importing Gitea Actions Token"
-# kubectl apply -f "$SECRETS_PATH/gitea-actions-token-sealed-secret.yaml"
-# echo "Gitea Actions Token Imported Successfully!"
-
 # Restore Persistent Volume from backup for Gitea
 echo "🔐 Restoring Data Volume..."
 # base/scripts/longhorn-automation.sh restore gitea
