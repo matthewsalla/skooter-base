@@ -1,3 +1,0 @@
-[submodule "helm-charts/gitea"]
-	path = helm-charts/gitea
-	url = git@gitea.com:mattsalla/helm-gitea-skooter-fork.git
