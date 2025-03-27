@@ -1,0 +1,56 @@
+{{- $giteaDataActRunner := index .Values "gitea-data-act-runner" }}
+{{- if $giteaDataActRunner.persistenceLonghorn.enabled }}
+
+{{/* Convert a size in Gi (e.g. "48Gi") to bytes */}}
+{{- $sizeStr := $giteaDataActRunner.persistenceLonghorn.size | trimSuffix "Gi" }}
+{{- $sizeGi := $sizeStr | int }}
+{{- $sizeBytes := mul $sizeGi (mul 1024 (mul 1024 1024)) }}
+
+---
+apiVersion: longhorn.io/v1beta2
+kind: Volume
+metadata:
+  name: {{ $giteaDataActRunner.persistenceLonghorn.pvName | quote }}
+  namespace: longhorn-system
+spec:
+  numberOfReplicas: {{ $giteaDataActRunner.persistenceLonghorn.numberOfReplicas }}
+  frontend: {{ $giteaDataActRunner.persistenceLonghorn.frontend | quote }}
+  backupTargetName: {{ $giteaDataActRunner.persistenceLonghorn.backupTargetName | quote }}
+  size: "{{ $sizeBytes }}"
+  {{- if $giteaDataActRunner.persistenceLonghorn.restore }}
+  fromBackup: {{ $giteaDataActRunner.persistenceLonghorn.fromBackup | quote }}
+  {{- end }}
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ $giteaDataActRunner.persistenceLonghorn.pvcName | quote }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  accessModes:
+    - {{ $giteaDataActRunner.persistenceLonghorn.accessMode | quote }}
+  resources:
+    requests:
+      storage: {{ $giteaDataActRunner.persistenceLonghorn.size | quote }}
+  storageClassName: {{ $giteaDataActRunner.persistenceLonghorn.storageClassName | quote }}
+  volumeName: {{ $giteaDataActRunner.persistenceLonghorn.pvName | quote }}
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ $giteaDataActRunner.persistenceLonghorn.pvName | quote }}
+spec:
+  capacity:
+    storage: {{ $giteaDataActRunner.persistenceLonghorn.size | quote }}
+  volumeMode: Filesystem
+  accessModes:
+    - {{ $giteaDataActRunner.persistenceLonghorn.accessMode | quote }}
+  persistentVolumeReclaimPolicy: {{ $giteaDataActRunner.persistenceLonghorn.reclaimPolicy | quote }}
+  storageClassName: {{ $giteaDataActRunner.persistenceLonghorn.storageClassName | quote }}
+  csi:
+    driver: {{ $giteaDataActRunner.persistenceLonghorn.csiDriver | quote }}
+    volumeHandle: {{ $giteaDataActRunner.persistenceLonghorn.pvName | quote }}
+
+{{- end }}

@@ -1,0 +1,86 @@
+gitea:
+  # Disable Gitea itself (replicaCount=0 => No Gitea pods)
+  replicaCount: 0
+
+  # Also disable Gitea's persistence, so no PVCs are created for the main app.
+  persistence:
+    enabled: false
+    create: false
+    mount: false
+
+  # Ensure the Ingress is off.
+  ingress:
+    enabled: false
+
+  # Turn off any unneeded database (e.g. PostgreSQL or postgresql-ha).
+  postgresql:
+    enabled: false
+  postgresql-ha:
+    enabled: false
+
+  actions:
+    enabled: true
+    statefulset:
+      annotations: {}
+      labels:
+        runner-labels: "ubuntu-latest"
+      actRunner:
+        repository: gitea/act_runner
+        tag: "0.2.11"
+        pullPolicy: IfNotPresent
+        extraVolumeMounts: []
+        # extraEnvs:
+        #   - name: GITEA_INSTANCE_URL
+        #     value: https://external-gitea.example.com
+      extraVolumes:
+        - name: docker-data
+          persistentVolumeClaim:
+            claimName: gitea-actions-docker-pvc
+      dind:
+        repository: docker
+        tag: "25.0.2-dind"
+        pullPolicy: IfNotPresent
+        extraVolumeMounts:
+          - name: docker-data
+            mountPath: /var/lib/docker
+      resources: {}
+      nodeSelector:
+        dedicated: gitea
+      tolerations: []
+      affinity: {}
+    provisioning:
+      enabled: false
+    existingSecret: "gitea-actions-token"
+    existingSecretKey: "token"
+
+gitea-actions-docker:
+  persistenceLonghorn:
+    enabled: true
+    restore: true
+    pvcName: "gitea-actions-docker-pvc"
+    pvName: "gitea-actions-docker-pv"
+    size: "28Gi"
+    accessMode: "ReadWriteOnce"
+    reclaimPolicy: "Retain"
+    storageClassName: "longhorn"
+    csiDriver: "driver.longhorn.io"
+    numberOfReplicas: 3
+    frontend: blockdev
+    backupTargetName: default
+    fromBackup: "s3://longhorn-backups@minio.example.com/longhorn?backup=dummy_backup_id&volume=gitea-actions-docker-pv"
+
+gitea-act-runner:
+  persistenceLonghorn:
+    enabled: false
+    restore: false
+    pvcName: "gitea-act-runner-pvc"
+    pvName: "gitea-act-runner-pv"
+    size: "1Gi"
+    accessMode: "ReadWriteOnce"
+    reclaimPolicy: "Retain"
+    storageClassName: "longhorn"
+    csiDriver: "driver.longhorn.io"
+    numberOfReplicas: 3
+    frontend: blockdev
+    backupTargetName: default
+    fromBackup: "s3://telossphere@192.168.14.222:9900/longhorn?backup=dummy_backup_id&volume=gitea-data-act-runner-pv"
