@@ -50,6 +50,55 @@ git submodule update --init --recursive
 
 ---
 
+## 📦 Cloning Thin Repo and Checking Out a Feature Branch in the Submodule
+
+```bash
+# Clone the thin repo and initialize submodules
+git clone --recurse-submodules <your-thin-repo-url>
+cd <your-thin-repo-folder>
+
+# OR if already cloned, just initialize the submodule
+git submodule update --init --recursive
+
+# Go into the submodule directory
+cd base
+
+# Fetch all remote branches
+git fetch origin
+
+# Checkout the desired feature branch in the submodule
+git checkout feature/deploy-gitea-stock
+
+# (Optional but recommended) Pull the latest changes for the feature branch
+git pull origin feature/deploy-gitea-stock
+
+# Go back to the thin repo root
+cd ..
+
+# Record the submodule branch update in the thin repo
+git add base
+git commit -m "Point submodule to feature/deploy-gitea-stock"
+```
+
+---
+
+## 🛠 Updating an Existing Repo to Track a Feature Branch in the Submodule
+
+If your submodule was already initialized and you just want to switch to the feature branch:
+
+```bash
+cd base
+git fetch origin
+git checkout feature/deploy-gitea-stock
+git pull origin feature/deploy-gitea-stock
+cd ..
+git add base
+git commit -m "Update submodule to feature/deploy-gitea-stock"
+```
+
+
+---
+
 ## 🧠 Pro Tips
 
 - Store thin repo-specific configuration (like `.env`, `terraform.tfvars`, and sealed secrets) **in the thin repo**, not here.
