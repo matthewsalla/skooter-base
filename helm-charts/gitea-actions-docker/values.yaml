@@ -1,14 +1,15 @@
-persistenceLonghorn:
-  enabled: true
-  restore: false
-  pvcName: "gitea-actions-docker-pvc"
-  pvName: "gitea-actions-docker-pv"
-  size: "28Gi"
-  accessMode: "ReadWriteOnce"
-  reclaimPolicy: "Retain"
-  storageClassName: "longhorn"
-  csiDriver: "driver.longhorn.io"
-  numberOfReplicas: 3
-  frontend: blockdev
-  backupTargetName: default
-  fromBackup: "s3://longhorn-backups@minio.example.com/longhorn?backup=dummy_backup_id&volume=gitea-actions-docker-pv"
+gitea-actions-docker:
+  persistenceLonghorn:
+    enabled: true
+    restore: false
+    pvcName: "gitea-actions-docker-pvc"
+    pvName: "gitea-actions-docker-pv"
+    size: "28Gi"
+    accessMode: "ReadWriteOnce"
+    reclaimPolicy: "Retain"
+    storageClassName: "longhorn"
+    csiDriver: "driver.longhorn.io"
+    numberOfReplicas: 3
+    frontend: blockdev
+    backupTargetName: default
+    fromBackup: "s3://longhorn-backups@minio.example.com/longhorn?backup=dummy_backup_id&volume=gitea-actions-docker-pv"

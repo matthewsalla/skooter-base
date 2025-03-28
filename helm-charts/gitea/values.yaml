@@ -83,7 +83,7 @@ gitea-postgres-db:
 
 gitea-actions-docker:
   persistenceLonghorn:
-    enabled: false
+    enabled: true
     restore: false
     pvcName: "gitea-actions-docker-pvc"
     pvName: "gitea-actions-docker-pv"
