@@ -1,3 +1,18 @@
+persistenceLonghorn:
+  enabled: false
+  restore: false
+  pvcName: "gitea-pvc"
+  pvName: "gitea-pv"       # Used for the static PV (restored volume)
+  size: "8Gi"
+  accessMode: "ReadWriteOnce"
+  reclaimPolicy: "Retain"
+  storageClassName: "longhorn"
+  csiDriver: "driver.longhorn.io"
+  numberOfReplicas: 3
+  frontend: blockdev
+  backupTargetName: default
+  fromBackup: "s3://longhorn-backups@minio.example.com/longhorn?backup=dummy_backup_id&volume=gitea-pv"
+
 gitea-actions-docker:
   persistenceLonghorn:
     enabled: true
@@ -13,3 +28,19 @@ gitea-actions-docker:
     frontend: blockdev
     backupTargetName: default
     fromBackup: "s3://longhorn-backups@minio.example.com/longhorn?backup=dummy_backup_id&volume=gitea-actions-docker-pv"
+
+gitea-postgres-db:
+  persistenceLonghorn:
+    enabled: false
+    restore: false
+    pvcName: "gitea-postgres-db-pvc"
+    pvName: "gitea-postgres-db-pv"
+    size: "10Gi"
+    accessMode: "ReadWriteOnce"
+    reclaimPolicy: "Retain"
+    storageClassName: "longhorn"
+    csiDriver: "driver.longhorn.io"
+    numberOfReplicas: 3
+    frontend: blockdev
+    backupTargetName: default
+    fromBackup: "s3://longhorn-backups@minio.example.com/longhorn?backup=dummy_backup_id&volume=gitea-postgres-db-pv"
