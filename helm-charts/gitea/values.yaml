@@ -29,6 +29,7 @@ gitea:
         DB_TYPE: sqlite3
   actions:
     enabled: false
+    deployDockerCache: false
 
 ingressroute:
   enabled: true
