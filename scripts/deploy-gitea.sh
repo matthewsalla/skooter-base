@@ -1,12 +1,13 @@
 #!/bin/bash
-set -e  # Exit on error
+set -euo pipefail
 
-# Determine the script's directory and source the configuration
+# -----------------------------------------
+# Load configuration
+# -----------------------------------------
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 if [ -f "$SCRIPT_DIR/config.sh" ]; then
   source "$SCRIPT_DIR/config.sh"
 else
-  # Fallback: Try to source config from the thin repo if available
   if [ -f "$SCRIPT_DIR/../../scripts/config.sh" ]; then
     source "$SCRIPT_DIR/../../scripts/config.sh"
   else
@@ -15,7 +16,6 @@ else
   fi
 fi
 
-# Load sensitive configuration from .env
 if [ -f ./terraform/.env ]; then
   source ./terraform/.env
 else
@@ -23,27 +23,76 @@ else
   exit 1
 fi
 
+# -----------------------------------------
+# Deploy Gitea
+# -----------------------------------------
 echo "📡 Deploying Gitea..."
 
-# Create Namespace
 kubectl create namespace gitea || true
 
 echo "🏷️  Labeling node for Gitea..."
 kubectl label node ${GITEA_NODE_NAME} dedicated=gitea --overwrite
 
-# Restore Persistent Volume from backup for Gitea
 echo "🔐 Restoring Data Volume..."
+# Uncomment and adjust these lines if you need to restore volumes:
 # base/scripts/longhorn-automation.sh restore gitea
 # base/scripts/longhorn-automation.sh restore gitea-postgres-db --wrapper
 # base/scripts/longhorn-automation.sh restore gitea-actions-docker --wrapper
 echo "✅ Persistent Data Volume Restored!"
 
-# Deploy Gitea
+echo "Deploying Gitea via Helm..."
 helm dependency update "$HELM_CHARTS_PATH/gitea"
 helm upgrade --install gitea "$HELM_CHARTS_PATH/gitea" \
   --namespace gitea \
   --values "$HELM_VALUES_PATH/gitea-values.yaml" \
   # --values "$HELM_VALUES_PATH/gitea-restored-volume.yaml" \
   # --values "$HELM_VALUES_PATH/gitea-postgres-db-restored-volume.yaml"
+
+# -----------------------------------------
+# Wait for Gitea Pod to be Ready
+# -----------------------------------------
+echo "⏳ Waiting for a Gitea pod to become Ready..."
+kubectl wait --for=condition=Ready pod -l app.kubernetes.io/name=gitea -n gitea --timeout=300s
+
+# Retrieve the name of one ready Gitea pod
+GITEA_POD=$(kubectl get pods -n gitea -l app.kubernetes.io/name=gitea -o jsonpath='{.items[0].metadata.name}')
+if [ -z "$GITEA_POD" ]; then
+  echo "Error: Could not find a ready Gitea pod in the gitea namespace."
+  exit 1
+fi
+echo "Using Gitea pod: $GITEA_POD"
+
+# -----------------------------------------
+# Retrieve Runner Token from Gitea Pod
+# -----------------------------------------
+echo "Retrieving Gitea Actions Runner Token from pod '$GITEA_POD'..."
+TOKEN=$(kubectl exec -n gitea "$GITEA_POD" -- gitea actions generate-runner-token)
+if [ -z "$TOKEN" ]; then
+  echo "Error: Runner token is empty. Verify that 'gitea actions generate-runner-token' runs correctly."
+  exit 1
+fi
+echo "Runner token retrieved."
+
+# -----------------------------------------
+# Generate Sealed Secret for Runner Token
+# -----------------------------------------
+echo "Generating sealed secret for Gitea Actions Token..."
+# Assumes generate-sealed-secret.sh is in the same directory as this script.
+SEAL_SCRIPT="$SCRIPT_DIR/generate-sealed-secret.sh"
+if [ ! -x "$SEAL_SCRIPT" ]; then
+  echo "Error: Sealed secret generation script not found or not executable at $SEAL_SCRIPT."
+  exit 1
+fi
+
+# Call the sealed secret generator with usage: <namespace> <secret-name> <key=value> ...
+# Here the secret is named "gitea-actions-token" and the key is "token".
+"$SEAL_SCRIPT" gitea gitea-actions-token token="$TOKEN"
+
+# -----------------------------------------
+# Import the Sealed Secret into the Cluster
+# -----------------------------------------
+echo "Importing Gitea Actions Token sealed secret..."
+kubectl apply -f "$SECRETS_PATH/gitea-actions-token-sealed-secret.yaml"
+echo "Gitea Actions Token Imported Successfully!"
 
 echo "✅ Gitea Deployed Successfully!"
