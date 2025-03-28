@@ -15,7 +15,7 @@ persistenceLonghorn:
 
 gitea-actions-docker:
   persistenceLonghorn:
-    enabled: true
+    enabled: false
     restore: false
     pvcName: "gitea-actions-docker-pvc"
     pvName: "gitea-actions-docker-pv"

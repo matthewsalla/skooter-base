@@ -40,10 +40,10 @@ base/scripts/longhorn-automation.sh restore gitea-actions-docker --wrapper
 echo "✅ Persistent Data Volume Restored!"
 
 echo "Deploying Gitea Volumes..."
-helm dependency update "$HELM_CHARTS_PATH/gitea-actions-docker"
-helm upgrade --install gitea-actions-docker "$HELM_CHARTS_PATH/gitea-actions-docker" \
+helm dependency update "$HELM_CHARTS_PATH/gitea-volumes"
+helm upgrade --install gitea-volumes "$HELM_CHARTS_PATH/gitea-volumes" \
   --namespace gitea \
-  --values "$HELM_VALUES_PATH/gitea-actions-docker-values.yaml" \
+  --values "$HELM_VALUES_PATH/gitea-volumes-values.yaml" \
   --values "$HELM_VALUES_PATH/gitea-restored-volume.yaml" \
   --values "$HELM_VALUES_PATH/gitea-actions-docker-restored-volume.yaml" \
   --values "$HELM_VALUES_PATH/gitea-postgres-db-restored-volume.yaml"
