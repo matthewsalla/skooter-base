@@ -3,9 +3,8 @@ gitea:
     dedicated: gitea
   persistence:
     enabled: true      # Make sure persistence is enabled
-    create: false
-    claimName: "gitea-pvc"  # Replace with the name of your existing PVC
-    # size: 8Gi
+    create: true
+    mount: true
   service:
     http:
       clusterIP: ""
@@ -52,7 +51,7 @@ certificate:
 
 persistenceLonghorn:
   enabled: false
-  restore: true
+  restore: false
   pvcName: "gitea-pvc"
   pvName: "gitea-pv"       # Used for the static PV (restored volume)
   size: "8Gi"
@@ -68,7 +67,7 @@ persistenceLonghorn:
 gitea-postgres-db:
   persistenceLonghorn:
     enabled: false
-    restore: true
+    restore: false
     pvcName: "gitea-postgres-db-pvc"
     pvName: "gitea-postgres-db-pv"
     size: "10Gi"
