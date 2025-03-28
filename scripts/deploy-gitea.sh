@@ -34,10 +34,9 @@ echo "🏷️  Labeling node for Gitea..."
 kubectl label node ${GITEA_NODE_NAME} dedicated=gitea --overwrite
 
 echo "🔐 Restoring Data Volume..."
-# Uncomment and adjust these lines if you need to restore volumes:
-# base/scripts/longhorn-automation.sh restore gitea
-# base/scripts/longhorn-automation.sh restore gitea-postgres-db --wrapper
-# base/scripts/longhorn-automation.sh restore gitea-actions-docker --wrapper
+base/scripts/longhorn-automation.sh restore gitea
+base/scripts/longhorn-automation.sh restore gitea-postgres-db --wrapper
+base/scripts/longhorn-automation.sh restore gitea-actions-docker --wrapper
 echo "✅ Persistent Data Volume Restored!"
 
 echo "Deploying Gitea Docker Caching Volume..."
@@ -45,15 +44,15 @@ helm dependency update "$HELM_CHARTS_PATH/gitea-actions-docker"
 helm upgrade --install gitea-actions-docker "$HELM_CHARTS_PATH/gitea-actions-docker" \
   --namespace gitea \
   --values "$HELM_VALUES_PATH/gitea-actions-docker-values.yaml" \
-  # --values "$HELM_VALUES_PATH/gitea-actions-docker-restored-volume.yaml" \
+  --values "$HELM_VALUES_PATH/gitea-actions-docker-restored-volume.yaml"
 
 echo "Deploying Gitea via Helm..."
 helm dependency update "$HELM_CHARTS_PATH/gitea"
 helm upgrade --install gitea "$HELM_CHARTS_PATH/gitea" \
   --namespace gitea \
   --values "$HELM_VALUES_PATH/gitea-values.yaml" \
-  # --values "$HELM_VALUES_PATH/gitea-restored-volume.yaml" \
-  # --values "$HELM_VALUES_PATH/gitea-postgres-db-restored-volume.yaml"
+  --values "$HELM_VALUES_PATH/gitea-restored-volume.yaml" \
+  --values "$HELM_VALUES_PATH/gitea-postgres-db-restored-volume.yaml"
 
 # -----------------------------------------
 # Wait for Gitea Pod to be Ready
