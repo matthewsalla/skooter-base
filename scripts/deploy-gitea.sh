@@ -40,6 +40,13 @@ echo "🔐 Restoring Data Volume..."
 # base/scripts/longhorn-automation.sh restore gitea-actions-docker --wrapper
 echo "✅ Persistent Data Volume Restored!"
 
+echo "Deploying Gitea Docker Caching Volume..."
+helm dependency update "$HELM_CHARTS_PATH/gitea-actions-docker"
+helm upgrade --install gitea-actions-docker "$HELM_CHARTS_PATH/gitea-actions-docker" \
+  --namespace gitea \
+  --values "$HELM_VALUES_PATH/gitea-values.yaml" \
+  # --values "$HELM_VALUES_PATH/gitea-actions-docker-restored-volume.yaml" \
+
 echo "Deploying Gitea via Helm..."
 helm dependency update "$HELM_CHARTS_PATH/gitea"
 helm upgrade --install gitea "$HELM_CHARTS_PATH/gitea" \
