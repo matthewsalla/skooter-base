@@ -59,13 +59,23 @@ echo "⚠️ WARNING: Would you like to first create a backup of the persistent 
 read -p "Create Backups? (yes/no): " confirm
 if [[ "$confirm" = "yes" ]]; then
     echo "🚀 Backing up volumes on the cluster..."
-# TODO: Refactor backup process to retrieve app list from parameter
-    ./base/scripts/longhorn-automation.sh backup trilium
-    # ../../longhorn-automation.sh backup grafana
-    # ../../longhorn-automation.sh backup mealie
-    # ../../longhorn-automation.sh backup gitea
-    # ../../longhorn-automation.sh backup gitea-actions-docker
-    echo "🚀 Volumes backed up"
+
+    BACKUP_LIST="./backup-commands.txt"
+
+    if [ ! -f "$BACKUP_LIST" ]; then
+        echo "❌ Backup command list not found: $BACKUP_LIST"
+        exit 1
+    fi
+
+    while IFS= read -r line || [ -n "$line" ]; do
+        [[ "$line" =~ ^#.*$ ]] && continue  # Skip comments
+        [[ -z "$line" ]] && continue        # Skip empty lines
+
+        echo "▶️  Running: $line"
+        eval "$line"
+    done < "$BACKUP_LIST"
+
+    echo "✅ All volumes backed up."
 fi
 
 echo "🔥 Destroying existing cluster..."
