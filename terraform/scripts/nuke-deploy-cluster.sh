@@ -57,24 +57,9 @@ fi
 
 echo "⚠️ WARNING: Would you like to first create a backup of the persistent volumes?"
 read -p "Create Backups? (yes/no): " confirm
-if [[ "$confirm" = "yes" ]]; then
+if [[ "$confirm" == "yes" ]]; then
     echo "🚀 Backing up volumes on the cluster..."
-
-    BACKUP_LIST="./backup-commands.txt"
-
-    if [ ! -f "$BACKUP_LIST" ]; then
-        echo "❌ Backup command list not found: $BACKUP_LIST"
-        exit 1
-    fi
-
-    while IFS= read -r line || [ -n "$line" ]; do
-        [[ "$line" =~ ^#.*$ ]] && continue  # Skip comments
-        [[ -z "$line" ]] && continue        # Skip empty lines
-
-        echo "▶️  Running: $line"
-        eval "$line"
-    done < "$BACKUP_LIST"
-
+    base/scripts/longhorn-batch.sh
     echo "✅ All volumes backed up."
 fi
 
