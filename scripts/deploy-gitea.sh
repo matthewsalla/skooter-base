@@ -33,9 +33,22 @@ kubectl create namespace gitea || true
 echo "🏷️  Labeling node for Gitea..."
 kubectl label node ${GITEA_NODE_NAME} dedicated=gitea --overwrite
 
+# -----------------------------------------
+# Conditionally Restore Postgres Volume
+# -----------------------------------------
+if [[ "${ENABLE_GITEA_POSTGRES_RESTORE:-false}" == "true" ]]; then
+  echo "📦 Restoring Gitea PostgreSQL Volume..."
+  base/scripts/longhorn-automation.sh restore gitea-postgres-db --wrapper
+
+  echo "💾 Including PostgreSQL volume values in Helm release..."
+  POSTGRES_RESTORE_VALUES="--values $HELM_VALUES_PATH/gitea-postgres-db-restored-volume.yaml"
+else
+  echo "⏩ Skipping PostgreSQL restore and volume config."
+  POSTGRES_RESTORE_VALUES=""
+fi
+
 echo "🔐 Restoring Data Volume..."
 base/scripts/longhorn-automation.sh restore gitea
-base/scripts/longhorn-automation.sh restore gitea-postgres-db --wrapper
 base/scripts/longhorn-automation.sh restore gitea-actions-docker --wrapper
 echo "✅ Persistent Data Volume Restored!"
 
@@ -46,7 +59,7 @@ helm upgrade --install gitea-volumes "$HELM_CHARTS_PATH/gitea-volumes" \
   --values "$HELM_VALUES_PATH/gitea-volumes-values.yaml" \
   --values "$HELM_VALUES_PATH/gitea-restored-volume.yaml" \
   --values "$HELM_VALUES_PATH/gitea-actions-docker-restored-volume.yaml" \
-  --values "$HELM_VALUES_PATH/gitea-postgres-db-restored-volume.yaml"
+  $POSTGRES_RESTORE_VALUES
 
 echo "Deploying Gitea via Helm..."
 helm dependency update "$HELM_CHARTS_PATH/gitea"
