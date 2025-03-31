@@ -3,9 +3,8 @@ gitea:
     dedicated: gitea
   persistence:
     enabled: true      # Make sure persistence is enabled
-    create: false
-    claimName: "gitea-pvc"  # Replace with the name of your existing PVC
-    # size: 8Gi
+    create: true
+    mount: true
   service:
     http:
       clusterIP: ""
@@ -49,34 +48,3 @@ certificate:
     kind: ClusterIssuer
   dnsNames:
     - git.example.com
-
-persistenceLonghorn:
-  enabled: true
-  restore: true
-  pvcName: "gitea-pvc"
-  pvName: "gitea-pv"       # Used for the static PV (restored volume)
-  size: "8Gi"
-  accessMode: "ReadWriteOnce"
-  reclaimPolicy: "Retain"
-  storageClassName: "longhorn"
-  csiDriver: "driver.longhorn.io"
-  numberOfReplicas: 3
-  frontend: blockdev
-  backupTargetName: default
-  fromBackup: "s3://longhorn-backups@minio.example.com/longhorn?backup=dummy_backup_id&volume=gitea-pv"
-
-gitea-postgres-db:
-  persistenceLonghorn:
-    enabled: false
-    restore: true
-    pvcName: "gitea-postgres-db-pvc"
-    pvName: "gitea-postgres-db-pv"
-    size: "10Gi"
-    accessMode: "ReadWriteOnce"
-    reclaimPolicy: "Retain"
-    storageClassName: "longhorn"
-    csiDriver: "driver.longhorn.io"
-    numberOfReplicas: 3
-    frontend: blockdev
-    backupTargetName: default
-    fromBackup: "s3://telossphere@192.168.14.222:9900/longhorn?backup=dummy_backup_id&volume=gitea-postgres-db-pv"
