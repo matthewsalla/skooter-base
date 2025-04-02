@@ -199,5 +199,3 @@ gitea-postgres-db:
 1. **Backup**: `longhorn-automation.sh backup <app_id>`  
 2. **Restore**: `longhorn-automation.sh restore <app_id> [--wrapper]`  
 3. **Deploy** via Helm with the generated YAML overrides.  
-
-If you have any questions or need help debugging, please reach out to the Telos engineering team or check the scripts for additional logging statements.
