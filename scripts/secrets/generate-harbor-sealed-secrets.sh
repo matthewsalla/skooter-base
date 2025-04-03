@@ -1,43 +1,51 @@
 #!/bin/bash
-# apply-sealed-secrets.sh
-# This script creates one "master" sealed secret that contains:
-#   1) Harbor admin password (key=HARBOR_ADMIN_PASSWORD)
-#   2) Global encryption secret (key=secretKey)
-#   3) Registry credentials password (key=REGISTRY_PASSWD)
-#
-# The Harbor chart can reference these via:
-#   existingSecretAdminPassword, existingSecretSecretKey,
-#   registry.credentials.existingSecret, etc.
 
-# 1. Function to generate a random alphanumeric string of a given length.
+set -euo pipefail
+
+# 🔍 Check for required tools
+required_tools=("tr" "head" "bash")
+for tool in "${required_tools[@]}"; do
+  if ! command -v "$tool" >/dev/null 2>&1; then
+    echo "❌ Required tool '$tool' is not installed or not in PATH."
+    exit 1
+  fi
+done
+
+# 🧪 Check that the sealed secret generator script exists
+sealed_secret_script="base/scripts/generate-sealed-secret.sh"
+if [[ ! -x "$sealed_secret_script" ]]; then
+  echo "❌ Required script '$sealed_secret_script' not found or not executable."
+  exit 1
+fi
+
+# 🔐 Function to generate a random alphanumeric string of a given length
 generate_random() {
   local length=$1
-  LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c "$length"
+  LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom 2>/dev/null | head -c "$length" || true
 }
 
-# 2. Define output file for secret definitions.
+# 📁 Define output file
 output_file="./secrets/helm_credentials.txt"
 mkdir -p "$(dirname "$output_file")"
-> "$output_file"  # Clear the file if it exists
+> "$output_file"
 
-# 3. Generate random values for each credential.
-admin_password=$(generate_random 16)           # Replaces "Harbor12345"
-encryption_secret=$(generate_random 16)          # Replaces "not-a-secure-key"
-registry_password=$(generate_random 16)          # Replaces "harbor_registry_password"
+# 🧬 Generate credentials
+admin_password=$(generate_random 16)
+encryption_secret=$(generate_random 16)
+registry_password=$(generate_random 16)
 
-# 4. Write one line that includes all keys in the single secret "harbor-master-secret".
-# Format: <namespace> <secret-name> key1=value1 key2=value2 ...
-echo "harbor harbor-master-secret HARBOR_ADMIN_PASSWORD=${admin_password} secretKey=${encryption_secret} REGISTRY_PASSWD=${registry_password}" >> "$output_file"
+# 🧾 Write credentials into one sealed secret definition
+echo "harbor harbor-master-secret HARBOR_ADMIN_PASSWORD=${admin_password} secretKey=${encryption_secret} REGISTRY_PASSWD=${registry_password} REGISTRY_HTPASSWD=$(htpasswd -nbB harbor_registry_user ${registry_password} | sed 's/\\$/\\\\$/g')" >> "$output_file"
 
-# 5. Convert the generated secret into a SealedSecret.
+# 🔁 Convert the generated secret into a SealedSecret
 echo "🔐 Generating sealed secret for Harbor..."
 while IFS= read -r line || [ -n "$line" ]; do
-  # Skip comments and empty lines.
   [[ "$line" =~ ^#.*$ ]] && continue
   [[ -z "$line" ]] && continue
-  # Split the line into separate arguments.
-  set -- $line
-  bash base/scripts/generate-sealed-secret.sh "$@"
+  bash "$sealed_secret_script" $line
 done < "$output_file"
 
-echo "✅ Harbor sealed secrets applied! Now update the chart values to reference them."
+echo "✅ Harbor sealed secrets applied! Now update your Helm values to reference:"
+echo "  existingSecretAdminPassword: harbor-master-secret"
+echo "  existingSecretSecretKey: harbor-master-secret"
+echo "  registry.credentials.existingSecret: harbor-master-secret"
