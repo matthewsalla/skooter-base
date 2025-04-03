@@ -21,12 +21,27 @@ echo "📡 Deploying Harbor.io"
 kubectl create namespace harbor || true
 
 echo "🔑 Import Harbor Secrets..."
-kubectl apply -f "$SECRETS_PATH/harbor-admin-secret-sealed-secret.yaml"
+kubectl apply -f "$SECRETS_PATH/harbor-master-secret-sealed-secret.yaml"
 
 # Restore Persistent Volume from backup for Harbor.io
 echo "🔐 Restoring Data Volume..."
-# base/scripts/longhorn-automation.sh restore harbor
+base/scripts/longhorn-automation.sh restore harbor-postgres-db --wrapper
+base/scripts/longhorn-automation.sh restore harbor-registry --wrapper
+base/scripts/longhorn-automation.sh restore harbor-jobservice --wrapper
+base/scripts/longhorn-automation.sh restore harbor-redis --wrapper
+base/scripts/longhorn-automation.sh restore harbor-trivy --wrapper
 echo "✅ Persistent Data Volume Restored!"
+
+# echo "Deploying Harbor Volumes..."
+helm dependency update "$HELM_CHARTS_PATH/harbor-volumes"
+helm upgrade --install harbor-volumes "$HELM_CHARTS_PATH/harbor-volumes" \
+  --namespace harbor \
+  --values "$HELM_VALUES_PATH/harbor-volumes-values.yaml" \
+  --values "$HELM_VALUES_PATH/harbor-postgres-db-restored-volume.yaml" \
+  --values "$HELM_VALUES_PATH/harbor-registry-restored-volume.yaml" \
+  --values "$HELM_VALUES_PATH/harbor-redis-restored-volume.yaml" \
+  --values "$HELM_VALUES_PATH/harbor-jobservice-restored-volume.yaml" \
+  --values "$HELM_VALUES_PATH/harbor-trivy-restored-volume.yaml"
 
 # Deploy Harbor.io App
 helm dependency update "$HELM_CHARTS_PATH/harbor"
