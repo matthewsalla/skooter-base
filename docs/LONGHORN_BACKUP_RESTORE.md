@@ -29,8 +29,8 @@ All essential environment variables are loaded from `./terraform/.env`. For exam
 # terraform/.env
 LONGHORN_USER="admin"
 LONGHORN_PASS="secret"
-LONGHORN_MANAGER="longhorn.telossphere.com"
-BACKUP_BASE_URL="s3://telossphere@192.168.14.222:9900/longhorn"
+LONGHORN_MANAGER="longhorn.exampleorg.com"
+BACKUP_BASE_URL="s3://exampleorg@192.168.14.222:9900/longhorn"
 ```
 
 > **Note:** The actual credentials are stored in the **Telos Bitwarden Vault**. Make sure to populate `.env` with the correct user/password/endpoint.
@@ -135,7 +135,7 @@ helm upgrade --install gitea-volumes "$HELM_CHARTS_PATH/gitea-volumes" \
 ```yaml
 gitea-postgres-db:
   persistenceLonghorn:
-    fromBackup: "s3://telossphere@192.168.14.222:9900/longhorn?backup=backup-673ee699e8e6417a&volume=gitea-postgres-db-pv"
+    fromBackup: "s3://exampleorg@192.168.14.222:9900/longhorn?backup=backup-673ee699e8e6417a&volume=gitea-postgres-db-pv"
 ```
 
 ### 6.2 Example Helm Chart Values for the Volume
@@ -155,7 +155,7 @@ gitea-postgres-db:
     numberOfReplicas: 3
     frontend: blockdev
     backupTargetName: default
-    fromBackup: "s3://telossphere@192.168.14.222:9900/longhorn?backup=dummy_backup_id&volume=gitea-postgres-db-pv"
+    fromBackup: "s3://exampleorg@192.168.14.222:9900/longhorn?backup=dummy_backup_id&volume=gitea-postgres-db-pv"
 ```
 
 > Once the script writes the real `fromBackup` value, Helm will restore the volume from that backup.
