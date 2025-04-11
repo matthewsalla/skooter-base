@@ -7,8 +7,8 @@ if [ -f "$SCRIPT_DIR/config.sh" ]; then
   source "$SCRIPT_DIR/config.sh"
 else
   # Fallback: Try to source config from the thin repo if available
-  if [ -f "$SCRIPT_DIR/../../scripts/config.sh" ]; then
-    source "$SCRIPT_DIR/../../scripts/config.sh"
+  if [ -f "$SCRIPT_DIR/../../../scripts/config.sh" ]; then
+    source "$SCRIPT_DIR/../../../scripts/config.sh"
   else
     echo "Missing config.sh file. Exiting."
     exit 1
