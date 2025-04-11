@@ -53,9 +53,7 @@ nextcloud:
     database: postgres
 
   redis:
-    enabled: true
-    host: nextcloud-redis-master.default.svc.cluster.local
-    password: your-redis-password
+    enabled: false
 
   strategy:
     type: Recreate
@@ -72,17 +70,7 @@ postgresql:
       existingClaim: nextcloud-postgres-db-pvc
 
 redis:
-  enabled: true
-  auth:
-    enabled: true
-    password: your-redis-password
-  architecture: standalone
-  sentinel:
-    enabled: false
-  master:
-    persistence:
-      enabled: true
-      existingClaim: nextcloud-redis-pvc
+  enabled: false
 
 mariadb:
   enabled: false

@@ -28,7 +28,7 @@ echo "🔐 Restoring Data Volume..."
 base/scripts/longhorn-automation.sh restore nextcloud-data --wrapper
 base/scripts/longhorn-automation.sh restore nextcloud-config --wrapper
 base/scripts/longhorn-automation.sh restore nextcloud-postgres-db --wrapper
-base/scripts/longhorn-automation.sh restore nextcloud-redis --wrapper
+# base/scripts/longhorn-automation.sh restore nextcloud-redis --wrapper
 echo "✅ Persistent Data Volume Restored!"
 
 # Deploy correct ClusterIssuer based on DEPLOYMENT_MODE
@@ -50,7 +50,7 @@ helm upgrade --install nextcloud-volumes "$HELM_CHARTS_PATH/nextcloud/volumes" \
   --values "$HELM_VALUES_PATH/nextcloud-data-restored-volume.yaml" \
   --values "$HELM_VALUES_PATH/nextcloud-config-restored-volume.yaml" \
   --values "$HELM_VALUES_PATH/nextcloud-postgres-db-restored-volume.yaml" \
-  --values "$HELM_VALUES_PATH/nextcloud-redis-restored-volume.yaml"
+#   --values "$HELM_VALUES_PATH/nextcloud-redis-restored-volume.yaml"
 
 # Deploy App
 helm dependency update "$HELM_CHARTS_PATH/nextcloud/app"

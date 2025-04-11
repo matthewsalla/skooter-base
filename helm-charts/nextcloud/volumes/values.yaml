@@ -46,18 +46,18 @@ nextcloud-postgres-db:
     backupTargetName: default
     fromBackup: "s3://longhorn-backups@minio.example.com/longhorn?backup=dummy_backup_id&volume=nextcloud-postgres-db-pv"
 
-nextcloud-redis:
-  persistenceLonghorn:
-    enabled: false
-    restore: false
-    pvcName: "nextcloud-redis-pvc"
-    pvName: "nextcloud-redis-pv"
-    size: "1Gi"
-    accessMode: "ReadWriteOnce"
-    reclaimPolicy: "Retain"
-    storageClassName: "longhorn"
-    csiDriver: "driver.longhorn.io"
-    numberOfReplicas: 3
-    frontend: blockdev
-    backupTargetName: default
-    fromBackup: "s3://exampleorg@minio.example.com/longhorn?backup=dummy_backup_id&volume=nextcloud-redis-pv"
+# nextcloud-redis:
+#   persistenceLonghorn:
+#     enabled: false
+#     restore: false
+#     pvcName: "nextcloud-redis-pvc"
+#     pvName: "nextcloud-redis-pv"
+#     size: "1Gi"
+#     accessMode: "ReadWriteOnce"
+#     reclaimPolicy: "Retain"
+#     storageClassName: "longhorn"
+#     csiDriver: "driver.longhorn.io"
+#     numberOfReplicas: 3
+#     frontend: blockdev
+#     backupTargetName: default
+#     fromBackup: "s3://exampleorg@minio.example.com/longhorn?backup=dummy_backup_id&volume=nextcloud-redis-pv"
