@@ -12,7 +12,7 @@ certificate:
   name: nextcloud-tls
   secretName: nextcloud-tls
   issuer:
-    name: "letsencrypt-staging"  # This value can be set via your CI/CD pipeline or .env file
+    name: "letsencrypt-staging"
     kind: ClusterIssuer
   dnsNames:
     - nextcloud.example.com
