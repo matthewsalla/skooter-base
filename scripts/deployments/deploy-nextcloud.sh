@@ -34,12 +34,12 @@ echo "✅ Persistent Data Volume Restored!"
 # Deploy correct ClusterIssuer based on DEPLOYMENT_MODE
 if [[ "$DEPLOYMENT_MODE" == "prod" ]]; then
   echo "🚀 Deploying Production..."
-  VALUES_FILE="$HELM_VALUES_PATH/prod/nextcloud-values.yaml"
-  VOLUMES_VALUES_FILE="$HELM_VALUES_PATH/prod/nextcloud-volumes-values.yaml"
+  VALUES_FILE="$HELM_VALUES_PATH/prod/nextcloud/nextcloud-values.yaml"
+  VOLUMES_VALUES_FILE="$HELM_VALUES_PATH/prod/nextcloud/nextcloud-volumes-values.yaml"
 else
   echo "⚠️  Deploying Staging..."
-  VALUES_FILE="$HELM_VALUES_PATH/staging/nextcloud-values.yaml"
-  VOLUMES_VALUES_FILE="$HELM_VALUES_PATH/staging/nextcloud-volumes-values.yaml"
+  VALUES_FILE="$HELM_VALUES_PATH/staging/nextcloud/nextcloud-values.yaml"
+  VOLUMES_VALUES_FILE="$HELM_VALUES_PATH/staging/nextcloud/nextcloud-volumes-values.yaml"
 fi
 
 # echo "Deploying App Volumes..."
