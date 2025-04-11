@@ -31,11 +31,22 @@ base/scripts/longhorn-automation.sh restore nextcloud-postgres-db --wrapper
 base/scripts/longhorn-automation.sh restore nextcloud-redis --wrapper
 echo "✅ Persistent Data Volume Restored!"
 
+# Deploy correct ClusterIssuer based on DEPLOYMENT_MODE
+if [[ "$DEPLOYMENT_MODE" == "staging" ]]; then
+  echo "⚠️  Deploying Staging..."
+  VALUES_FILE           ="$HELM_VALUES_PATH/staging/nextcloud-values.yaml"
+  VOLUMES_VALUES_FILE   ="$HELM_VALUES_PATH/staging/nextcloud-volumes-values.yaml"
+else
+  echo "🚀 Deploying Production..."
+  VALUES_FILE           ="$HELM_VALUES_PATH/prod/nextcloud-values.yaml"
+  VOLUMES_VALUES_FILE   ="$HELM_VALUES_PATH/prod/nextcloud-volumes-values.yaml"
+fi
+
 # echo "Deploying App Volumes..."
 helm dependency update "$HELM_CHARTS_PATH/nextcloud/volumes"
 helm upgrade --install nextcloud-volumes "$HELM_CHARTS_PATH/nextcloud/volumes" \
   --namespace nextcloud \
-  --values "$HELM_VALUES_PATH/nextcloud-volumes-values.yaml" \
+  --values "$VOLUMES_VALUES_FILE" \
   --values "$HELM_VALUES_PATH/nextcloud-data-restored-volume.yaml" \
   --values "$HELM_VALUES_PATH/nextcloud-config-restored-volume.yaml" \
   --values "$HELM_VALUES_PATH/nextcloud-postgres-db-restored-volume.yaml" \
@@ -45,7 +56,6 @@ helm upgrade --install nextcloud-volumes "$HELM_CHARTS_PATH/nextcloud/volumes" \
 helm dependency update "$HELM_CHARTS_PATH/nextcloud/app"
 helm upgrade --install nextcloud "$HELM_CHARTS_PATH/nextcloud/app" \
   --namespace nextcloud \
-  --values "$HELM_VALUES_PATH/nextcloud-values.yaml"
-
+  --values "$VALUES_FILE"
 
 echo "✅ Nextcloud Deployed Successfully!"
