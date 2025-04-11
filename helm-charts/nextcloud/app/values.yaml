@@ -1,0 +1,89 @@
+ingressroute:
+  enabled: true
+  host: "nextcloud.example.com"
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: "websecure"
+    traefik.ingress.kubernetes.io/router.tls: "true"
+  tls:
+    secretName: "nextcloud-tls"
+
+certificate:
+  enabled: true
+  name: nextcloud-tls
+  secretName: nextcloud-tls
+  issuer:
+    name: "letsencrypt-staging"  # This value can be set via your CI/CD pipeline or .env file
+    kind: ClusterIssuer
+  dnsNames:
+    - nextcloud.example.com
+
+service:
+  port: 80
+
+nextcloud:
+  image:
+    tag: 29.0.0
+
+  replicaCount: 1
+
+  nextcloud:
+    host: nextcloud.example.com
+    username: admin
+    password: changeme  # Optional: replace with secret ref
+    datadir: /data
+    trustedDomains:
+      - nextcloud.example.com
+
+  ingress:
+    enabled: false
+
+  persistence:
+    enabled: true
+    existingClaim: nextcloud-config-pvc  # Mounts /var/www/html
+  nextcloudData:
+    enabled: true
+    existingClaim: nextcloud-data-pvc    # Mounts /data
+
+  externalDatabase:
+    enabled: true
+    type: postgresql
+    host: nextcloud-postgresql.default.svc.cluster.local
+    user: postgres
+    password: your-postgres-password
+    database: postgres
+
+  redis:
+    enabled: true
+    host: nextcloud-redis-master.default.svc.cluster.local
+    password: your-redis-password
+
+  strategy:
+    type: Recreate
+
+postgresql:
+  enabled: true
+  auth:
+    username: postgres
+    password: your-postgres-password
+    database: postgres
+  primary:
+    persistence:
+      enabled: true
+      existingClaim: nextcloud-postgres-db-pvc
+
+redis:
+  enabled: true
+  auth:
+    enabled: true
+    password: your-redis-password
+  architecture: standalone
+  master:
+    persistence:
+      enabled: true
+      existingClaim: nextcloud-redis-pvc
+
+mariadb:
+  enabled: false
+
+collabora:
+  enabled: false

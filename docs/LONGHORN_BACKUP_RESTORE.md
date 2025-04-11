@@ -9,7 +9,7 @@ This document explains how to back up and restore volumes in **Longhorn** using:
 ## 1. Prerequisites
 
 1. **Longhorn** must be installed and running in your Kubernetes cluster.  
-   - The Longhorn UI (e.g. [https://longhorn.telossphere.com/#/backup#volume](https://longhorn.telossphere.com/#/backup#volume)) should be accessible.
+   - The Longhorn UI (e.g. [https://longhorn.exampleorg.com/#/backup#volume](https://longhorn.exampleorg.com/#/backup#volume)) should be accessible.
    
 2. **Required CLI tools** on your local machine (or CI runner):
    - `jq`
@@ -30,7 +30,7 @@ All essential environment variables are loaded from `./terraform/.env`. For exam
 LONGHORN_USER="admin"
 LONGHORN_PASS="secret"
 LONGHORN_MANAGER="longhorn.exampleorg.com"
-BACKUP_BASE_URL="s3://exampleorg@192.168.14.222:9900/longhorn"
+BACKUP_BASE_URL="s3://exampleorg@minio.example.com/longhorn"
 ```
 
 > **Note:** The actual credentials are stored in the **Telos Bitwarden Vault**. Make sure to populate `.env` with the correct user/password/endpoint.
@@ -135,7 +135,7 @@ helm upgrade --install gitea-volumes "$HELM_CHARTS_PATH/gitea-volumes" \
 ```yaml
 gitea-postgres-db:
   persistenceLonghorn:
-    fromBackup: "s3://exampleorg@192.168.14.222:9900/longhorn?backup=backup-673ee699e8e6417a&volume=gitea-postgres-db-pv"
+    fromBackup: "s3://exampleorg@minio.example.com/longhorn?backup=backup-673ee699e8e6417a&volume=gitea-postgres-db-pv"
 ```
 
 ### 6.2 Example Helm Chart Values for the Volume
@@ -155,7 +155,7 @@ gitea-postgres-db:
     numberOfReplicas: 3
     frontend: blockdev
     backupTargetName: default
-    fromBackup: "s3://exampleorg@192.168.14.222:9900/longhorn?backup=dummy_backup_id&volume=gitea-postgres-db-pv"
+    fromBackup: "s3://exampleorg@minio.example.com/longhorn?backup=dummy_backup_id&volume=gitea-postgres-db-pv"
 ```
 
 > Once the script writes the real `fromBackup` value, Helm will restore the volume from that backup.

@@ -28,7 +28,7 @@ harbor-registry:
     numberOfReplicas: 3
     frontend: blockdev
     backupTargetName: default
-    fromBackup: "s3://telossphere@192.168.14.222:9900/longhorn?backup=dummy_backup_id&volume=harbor-registry-pv"
+    fromBackup: "s3://exampleorg@minio.example.com/longhorn?backup=dummy_backup_id&volume=harbor-registry-pv"
 
 harbor-redis:
   persistenceLonghorn:
@@ -44,7 +44,7 @@ harbor-redis:
     numberOfReplicas: 3
     frontend: blockdev
     backupTargetName: default
-    fromBackup: "s3://telossphere@192.168.14.222:9900/longhorn?backup=dummy_backup_id&volume=harbor-redis-pv"
+    fromBackup: "s3://exampleorg@minio.example.com/longhorn?backup=dummy_backup_id&volume=harbor-redis-pv"
 
 harbor-jobservice:
   persistenceLonghorn:
@@ -60,7 +60,7 @@ harbor-jobservice:
     numberOfReplicas: 3
     frontend: blockdev
     backupTargetName: default
-    fromBackup: "s3://telossphere@192.168.14.222:9900/longhorn?backup=dummy_backup_id&volume=harbor-jobservice-pv"
+    fromBackup: "s3://exampleorg@minio.example.com/longhorn?backup=dummy_backup_id&volume=harbor-jobservice-pv"
 
 harbor-trivy:
   persistenceLonghorn:
@@ -76,4 +76,4 @@ harbor-trivy:
     numberOfReplicas: 3
     frontend: blockdev
     backupTargetName: default
-    fromBackup: "s3://telossphere@192.168.14.222:9900/longhorn?backup=dummy_backup_id&volume=harbor-trivy-pv"
+    fromBackup: "s3://exampleorg@minio.example.com/longhorn?backup=dummy_backup_id&volume=harbor-trivy-pv"
