@@ -38,19 +38,12 @@ nextcloud:
     enabled: false
 
   persistence:
-    enabled: true
-    existingClaim: nextcloud-config-pvc  # Mounts /var/www/html
+    enabled: false
   nextcloudData:
-    enabled: true
-    existingClaim: nextcloud-data-pvc    # Mounts /data
+    enabled: false
 
   externalDatabase:
-    enabled: true
-    type: postgresql
-    host: nextcloud-postgresql.default.svc.cluster.local
-    user: postgres
-    password: your-postgres-password
-    database: postgres
+    enabled: false
 
   redis:
     enabled: false
@@ -59,15 +52,7 @@ nextcloud:
     type: Recreate
 
 postgresql:
-  enabled: true
-  auth:
-    username: postgres
-    password: your-postgres-password
-    database: postgres
-  primary:
-    persistence:
-      enabled: true
-      existingClaim: nextcloud-postgres-db-pvc
+  enabled: false
 
 redis:
   enabled: false
