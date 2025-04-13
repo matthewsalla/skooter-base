@@ -18,12 +18,12 @@ fi
 echo "🚀 Deploying Traefik"
 
 # Deploy based on DEPLOYMENT_MODE
-if [[ "$DEPLOYMENT_MODE" == "staging" ]]; then
-  echo "⚠️  Deploying Traefik w/ Staging ClusterIssuer..."
-  VALUES_FILE="$HELM_VALUES_PATH/staging/traefik-values.yaml"
-else
+if [[ "$DEPLOYMENT_MODE" == "prod" ]]; then
   echo "🚀  Deploying Traefik w/ Production ClusterIssuer..."
   VALUES_FILE="$HELM_VALUES_PATH/prod/traefik-values.yaml"
+else
+  echo "⚠️  Deploying Traefik w/ Staging ClusterIssuer..."
+  VALUES_FILE="$HELM_VALUES_PATH/staging/traefik-values.yaml"
 fi
 
 helm repo add traefik https://helm.traefik.io/traefik

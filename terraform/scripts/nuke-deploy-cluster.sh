@@ -33,13 +33,13 @@ if [[ -z "$CONTROL_PLANE_IP" || "$CONTROL_PLANE_IP" == "null" ]]; then
 fi
 
 DEPLOYMENT_MODE=${1:-staging}
-# Check for "staging" argument
-if [[ "$1" == "staging" ]]; then
-    CERT_ISSUER="letsencrypt-staging"
-    echo "⚠️  Using Let's Encrypt Staging Mode!"
-else
+# Check for "prod" argument
+if [[ "$1" == "prod" ]]; then
     CERT_ISSUER="letsencrypt-prod"
     echo "🚀  Using Let's Encrypt Production Mode!"
+else
+    CERT_ISSUER="letsencrypt-staging"
+    echo "⚠️  Using Let's Encrypt Staging Mode!"
 fi
 
 # Pass DEPLOYMENT_MODE and CERT_ISSUER to other scripts
