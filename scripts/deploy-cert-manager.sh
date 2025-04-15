@@ -31,12 +31,12 @@ kubectl apply -f "$SECRETS_PATH/cert-manager-cloudflare-api-credentials-sealed-s
 echo "🎯 Key successfully imported!"
 
 # Deploy correct ClusterIssuer based on DEPLOYMENT_MODE
-if [[ "$DEPLOYMENT_MODE" == "staging" ]]; then
-  echo "⚠️  Deploying Let's Encrypt Staging ClusterIssuer..."
-  VALUES_FILE="$HELM_VALUES_PATH/staging/cert-manager-clusterissuer-values.yaml"
-else
+if [[ "$DEPLOYMENT_MODE" == "prod" ]]; then
   echo "🚀 Deploying Let's Encrypt Production ClusterIssuer..."
   VALUES_FILE="$HELM_VALUES_PATH/prod/cert-manager-clusterissuer-values.yaml"
+else
+  echo "⚠️  Deploying Let's Encrypt Staging ClusterIssuer..."
+  VALUES_FILE="$HELM_VALUES_PATH/staging/cert-manager-clusterissuer-values.yaml"
 fi
 
 helm dependency update "$HELM_CHARTS_PATH/clusterissuer-chart"
