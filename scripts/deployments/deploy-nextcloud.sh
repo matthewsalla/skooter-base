@@ -20,8 +20,8 @@ echo "📡 Deploying Nextcloud"
 # Create Namespace
 kubectl create namespace nextcloud || true
 
-# echo "🔑 Import Secrets..."
-# kubectl apply -f "$SECRETS_PATH/nextcloud-master-secret-sealed-secret.yaml"
+echo "🔑 Import Secrets..."
+kubectl apply -f "$SECRETS_PATH/nextcloud-creds-sealed-secret.yaml"
 
 # Restore Persistent Volume from backup
 echo "🔐 Restoring Data Volume..."
@@ -42,7 +42,7 @@ else
   VOLUMES_VALUES_FILE="$HELM_VALUES_PATH/staging/nextcloud/nextcloud-volumes-values.yaml"
 fi
 
-# echo "Deploying App Volumes..."
+echo "Deploying App Volumes..."
 helm dependency update "$HELM_CHARTS_PATH/nextcloud/volumes"
 helm upgrade --install nextcloud-volumes "$HELM_CHARTS_PATH/nextcloud/volumes" \
   --namespace nextcloud \

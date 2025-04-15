@@ -1,6 +1,6 @@
 ingressroute:
-  enabled: true
-  host: "nextcloud.example.com"
+  enabled: false
+  host: "nextcloud.example.company"
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: "websecure"
     traefik.ingress.kubernetes.io/router.tls: "true"
@@ -8,57 +8,61 @@ ingressroute:
     secretName: "nextcloud-tls"
 
 certificate:
-  enabled: true
+  enabled: false
   name: nextcloud-tls
   secretName: nextcloud-tls
   issuer:
     name: "letsencrypt-staging"
     kind: ClusterIssuer
   dnsNames:
-    - nextcloud.example.com
+    - nextcloud.example.company
 
 service:
   port: 80
 
 nextcloud:
-  image:
-    tag: 29.0.0
 
-  replicaCount: 1
-
+  # Configure the Nextcloud application details
   nextcloud:
-    host: nextcloud.example.com
-    username: admin
-    password: changeme  # Optional: replace with secret ref
-    datadir: /data
+    host: "nextcloud.example.company"        # Set your desired FQDN or IP for Nextcloud
+    username: "admin"                     # Administrator username
+    password: "YourSecurePassword"        # Administrator password (change as needed)
     trustedDomains:
-      - nextcloud.example.com
+      - "nextcloud.example.company"          # Add all domains/IPs that should be trusted
+    # Optionally, you can set a custom data directory:
+    # datadir: "/var/www/html/data"
 
+  # Enable and configure the ingress resource
   ingress:
-    enabled: false
+    enabled: false                         # Enable ingress for external access
 
+  # Enable persistence using a PVC and the K3s default storage class ("local-path")
   persistence:
-    enabled: false
-  nextcloudData:
-    enabled: false
+    enabled: true                         # Turn on persistent storage
+    storageClass: "local-path"            # Use the K3s default storage class
+    accessMode: ReadWriteOnce             # Typical access mode for single-node writes
+    size: 10Gi                            # Define the storage size as needed
 
-  externalDatabase:
-    enabled: false
+  # Optionally, set resource requests and limits for the Nextcloud pod(s)
+  resources:
+    requests:
+      cpu: "200m"
+      memory: "512Mi"
+    limits:
+      cpu: "500m"
+      memory: "1Gi"
 
-  redis:
-    enabled: false
-
-  strategy:
-    type: Recreate
-
-postgresql:
-  enabled: false
-
-redis:
-  enabled: false
-
-mariadb:
-  enabled: false
-
-collabora:
-  enabled: false
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 80
+    periodSeconds: 15
+    timeoutSeconds: 10
+    failureThreshold: 5
+    successThreshold: 1
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 80
+    periodSeconds: 15
+    timeoutSeconds: 10
+    failureThreshold: 5
+    successThreshold: 1
