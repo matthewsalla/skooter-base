@@ -11,7 +11,6 @@ resource "tls_private_key" "cluster_key" {
   rsa_bits  = 4096
 }
 
-
 # Create a storage pool for attached drives
 resource "libvirt_pool" "k3s_cluster_main_pool_main" {
   name = var.k3s_cluster_main_pool_name
@@ -41,31 +40,20 @@ resource "libvirt_volume" "longhorn_disks" {
   pool   = libvirt_pool.longhorn_pools[each.key].name  # Use dynamically created pools
   format   = "qcow2"
   size     = each.value.longhorn_disk_size * 1024 * 1024 * 1024
-  # size     = 1073741824000  # 1TB in bytes
 
   depends_on = [libvirt_pool.longhorn_pools]  # Ensure storage pool is created first
 }
 
-# Base Ubuntu image
 resource "libvirt_volume" "k3s_base_disks" {
-  for_each  = var.k3s_nodes
+  for_each       = var.k3s_nodes
 
-  name   = "disk-${each.key}.qcow2"
+  name           = "disk-${each.key}.qcow2"
+  pool           = "base-image-pool"
 
-  pool   = libvirt_pool.k3s_cluster_main_pool_main.name
-  
-  # Clone the base image instead of using it directly
-  base_volume_id = libvirt_volume.base_image.id
+  # libvirt key for a DIR pool is the absolute path:
+  base_volume_id = "/var/lib/libvirt/base-images/ubuntu-base-uncompressed.qcow2"
+
   size   = each.value.disk * 1024 * 1024 * 1024
-  
-  format = "qcow2"
-}
-
-# Define the base image volume separately
-resource "libvirt_volume" "base_image" {
-  name   = "ubuntu-base.qcow2"
-  pool   = libvirt_pool.k3s_cluster_main_pool_main.name
-  source = var.ubuntu_image_url
   format = "qcow2"
 }
 

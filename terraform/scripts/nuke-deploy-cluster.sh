@@ -48,19 +48,25 @@ export CERT_ISSUER
 
 echo "🔄 Nuke and Deploy K3s Cluster"
 
-echo "⚠️ WARNING: This will destroy and redeploy your entire cluster!"
-read -p "Are you sure? (yes/no): " confirm
-if [[ "$confirm" != "yes" ]]; then
-    echo "❌ Operation cancelled."
-    exit 1
-fi
+OVERRIDE=${2:-}
 
-echo "⚠️ WARNING: Would you like to first create a backup of the persistent volumes?"
-read -p "Create Backups? (yes/no): " confirm
-if [[ "$confirm" == "yes" ]]; then
-    echo "🚀 Backing up volumes on the cluster..."
-    base/scripts/longhorn-batch.sh
-    echo "✅ All volumes backed up."
+if [[ "$OVERRIDE" != "--yes" ]]; then
+  echo "⚠️ WARNING: This will destroy and redeploy your entire cluster!"
+  read -p "Are you sure? (yes/no): " confirm
+  if [[ "$confirm" != "yes" ]]; then
+      echo "❌ Operation cancelled."
+      exit 1
+  fi
+
+  echo "⚠️ WARNING: Would you like to first create a backup of the persistent volumes?"
+  read -p "Create Backups? (yes/no): " confirm
+  if [[ "$confirm" == "yes" ]]; then
+      echo "🚀 Backing up volumes on the cluster..."
+      base/scripts/longhorn-batch.sh
+      echo "✅ All volumes backed up."
+  fi
+else
+  echo "✅ Override flag detected — skipping prompts and backup step."
 fi
 
 echo "🔥 Destroying existing cluster..."
