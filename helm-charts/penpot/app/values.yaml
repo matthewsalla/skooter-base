@@ -1,0 +1,56 @@
+ingressroute:
+  enabled: false
+  host: "penpot.example.company"
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: "websecure"
+    traefik.ingress.kubernetes.io/router.tls: "true"
+  tls:
+    secretName: "penpot-tls"
+
+certificate:
+  enabled: false
+  name: penpot-tls
+  secretName: penpot-tls
+  issuer:
+    name: "letsencrypt-staging"
+    kind: ClusterIssuer
+  dnsNames:
+    - penpot.example.company
+
+service:
+  port: 80
+
+penpot:
+  global:
+    postgresqlEnabled: true        # spin up Bitnami PostgreSQL
+    redisEnabled: true             # spin up Bitnami Redis
+    imagePullSecrets: []           # add if you use a private registry
+
+  config:
+    publicUri: "https://penpot.example.company"       # your final public URL
+    apiSecretKey: "VpC05spTdVOKUv6dx0LSQXasZKQijT3SqsXlajBYplWPQCq2TuOdojJ6c0vf6fv9"     # python3 -c 'import secrets,sys;print(secrets.token_urlsafe(64))'
+    flags: "enable-registration enable-login-with-password disable-email-verification"  # SMTP off for now
+
+  # --- persistence for design assets ------------------------------------------
+  persistence:
+    assets:
+      enabled: true
+      storageClass: longhorn       # Longhorn default
+      size: 20Gi                   # tweak as needed
+
+  # --- PostgreSQL quick defaults ----------------------------------------------
+  postgresql:
+    auth:
+      username: penpot
+      password: penpot
+      database: penpot
+    primary:
+      persistence:
+        storageClass: longhorn
+        size: 8Gi
+
+  # --- Redis (no auth, single replica) ----------------------------------------
+  redis:
+    architecture: standalone
+    auth:
+      enabled: false

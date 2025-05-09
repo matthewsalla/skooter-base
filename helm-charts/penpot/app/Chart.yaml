@@ -1,0 +1,19 @@
+apiVersion: v2
+name: penpot
+description: A Helm chart for deploying penpot
+type: application
+version: 0.1.0
+appVersion: 2.6.1
+
+dependencies:
+  - name: penpot
+    version: 0.17.0
+    repository: http://helm.penpot.app
+  - name: postgresql
+    version: 15.5.0
+    repository: oci://registry-1.docker.io/bitnamicharts
+    condition: postgresql.enabled
+  - name: redis
+    version: 19.6.4
+    repository: oci://registry-1.docker.io/bitnamicharts
+    condition: redis.enabled
