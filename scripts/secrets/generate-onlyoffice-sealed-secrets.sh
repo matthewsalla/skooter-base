@@ -38,7 +38,7 @@ jwt_secret=$(generate_random 44)
 amqp_uri="amqp://onlyoffice:${rabbitmq_password}@onlyoffice-backend-rabbitmq:5672/?frameMax=0"
 
 # 🧾 Write credentials into one sealed secret definition
-echo "nextcloud onlyoffice-creds postgres-password=${postgres_password} redis-password=${redis_password} erlang-cookie=${erlang_cookie} rabbitmq-password=${rabbitmq_password} amqp-uri='${amqp_uri}' JWT_ENABLED=true JWT_HEADER=Authorization JWT_IN_BODY=false JWT_SECRET=${jwt_secret}" >> "$output_file"
+echo "nextcloud onlyoffice-creds postgres-password=${postgres_password} redis-password=${redis_password} erlang-cookie=${erlang_cookie} rabbitmq-password=${rabbitmq_password} amqp-uri=${amqp_uri} JWT_ENABLED=true JWT_HEADER=Authorization JWT_IN_BODY=false JWT_SECRET=${jwt_secret}" >> "$output_file"
 
 # 🔁 Convert the generated secret into a SealedSecret
 echo "🔐 Generating sealed secret for OnlyOffice..."
