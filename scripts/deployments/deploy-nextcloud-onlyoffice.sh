@@ -30,7 +30,7 @@ kubectl apply -f "$MIDDLEWARES_PATH/onlyoffice-secure-headers.yaml"
 # 3️⃣ Restore Volumes via Longhorn
 echo "🔐 Restoring OnlyOffice volumes..."
 base/scripts/longhorn-automation.sh restore onlyoffice-files   --wrapper
-base/scripts/longhorn-automation.sh restore onlyoffice-postgres   --wrapper
+base/scripts/longhorn-automation.sh restore onlyoffice-postgres-db   --wrapper
 echo "✅ OnlyOffice volumes restored!"
 
 # 4️⃣ Choose prod vs. staging
@@ -53,7 +53,7 @@ helm upgrade --install onlyoffice-volumes "$HELM_CHARTS_PATH/onlyoffice/volumes"
   --namespace nextcloud \
   --values "$VOLS_FILE" \
   --values "$HELM_VALUES_PATH/onlyoffice-files-restored-volume.yaml" \
-  --values "$HELM_VALUES_PATH/onlyoffice-postgres-restored-volume.yaml" \
+  --values "$HELM_VALUES_PATH/onlyoffice-postgres-db-restored-volume.yaml" \
 
 # 5️⃣ Deploy backend subchart
 echo "📦 Deploying OnlyOffice-backend chart..."
