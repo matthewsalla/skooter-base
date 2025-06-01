@@ -47,4 +47,5 @@ exec_occ app:enable onlyoffice
 exec_occ config:app:set onlyoffice DocumentServerUrl --value="$PUBLIC_URL"
 exec_occ config:app:set onlyoffice DocumentServerInternalUrl --value="$INTERNAL_URL"
 exec_occ config:app:set onlyoffice StorageUrl --value="$STORAGE_URL"
-exec_occ config:app:set onlyoffice jwt_secret --value="$JWT_SECRET"
+exec_occ config:app:set onlyoffice jwt_secret --value="$JWT_SECRET" >/dev/null 2>&1
+#exec_occ config:app:set onlyoffice jwt_secret --value="$JWT_SECRET"
