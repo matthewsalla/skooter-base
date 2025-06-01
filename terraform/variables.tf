@@ -17,6 +17,16 @@ variable "k3s_cluster_main_pool_name" {
   description = "Main storage pool name for all nodes"
 }
 
+variable "k3s_cluster_base_pool" {
+  type        = string
+  description = "Base Images storage pool for all nodes"
+}
+
+variable "k3s_cluster_base_pool_name" {
+  type        = string
+  description = "Base images storage pool name for all nodes"
+}
+
 variable "gateway_ip" {
   type        = string
   description = "IP address of the Gateway (typically the router)"

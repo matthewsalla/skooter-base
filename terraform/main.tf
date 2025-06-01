@@ -21,6 +21,15 @@ resource "libvirt_pool" "k3s_cluster_main_pool_main" {
   }
 }
 
+resource "libvirt_pool" "k3s_cluster_base_pool_main" {
+  name = var.k3s_cluster_base_pool_name
+  type = "dir"
+  
+  target {
+    path = var.k3s_cluster_base_pool
+  }
+}
+
 resource "libvirt_pool" "longhorn_pools" {
   for_each = { for key, value in var.k3s_nodes : key => value if value.longhorn_disk != "" }
 
@@ -44,14 +53,20 @@ resource "libvirt_volume" "longhorn_disks" {
   depends_on = [libvirt_pool.longhorn_pools]  # Ensure storage pool is created first
 }
 
+resource "libvirt_volume" "ubuntu_base" {
+  name   = "ubuntu-noble-base.qcow2"
+  pool   = libvirt_pool.k3s_cluster_base_pool_main.name
+  source = "https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img"
+  format = "qcow2"
+}
+
 resource "libvirt_volume" "k3s_base_disks" {
   for_each       = var.k3s_nodes
 
   name           = "disk-${each.key}.qcow2"
-  pool           = "base-image-pool"
+  pool           = libvirt_pool.k3s_cluster_main_pool_main.name
 
-  # libvirt key for a DIR pool is the absolute path:
-  base_volume_id = "/var/lib/libvirt/base-images/ubuntu-base-uncompressed.qcow2"
+  base_volume_id = libvirt_volume.ubuntu_base.id
 
   size   = each.value.disk * 1024 * 1024 * 1024
   format = "qcow2"
