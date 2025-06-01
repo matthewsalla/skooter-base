@@ -73,27 +73,34 @@ for node in $(kubectl get nodes -l longhorn-true -o name | awk -F'/' '{print $2}
   echo "Tagging Longhorn node: $node..."
 
   for attempt in {1..25}; do
-    # Check if the Longhorn node is ready by querying its Ready condition
-    node_ready=$(kubectl get -n longhorn-system nodes.longhorn.io "$node" -o jsonpath="{.status.conditions[?(@.type=='Ready')].status}")
-    
-    if [ "$node_ready" != "True" ]; then
-      echo "⏳ Node $node is not ready (Ready status: $node_ready). Retrying in 5 seconds (attempt $attempt/10)..."
+    # Check if the Longhorn node resource exists
+    if ! kubectl get -n longhorn-system nodes.longhorn.io "$node" &>/dev/null; then
+      echo "⏳ Longhorn node resource $node not yet available. Retrying in 5 seconds (attempt $attempt/25)..."
       sleep 5
       continue
     fi
 
-    # If node is ready, attempt to patch the node with the Longhorn tag
+    # Check if the node is marked Ready by Longhorn
+    node_ready=$(kubectl get -n longhorn-system nodes.longhorn.io "$node" -o jsonpath="{.status.conditions[?(@.type=='Ready')].status}")
+    if [ "$node_ready" != "True" ]; then
+      echo "⏳ Node $node exists but is not Ready yet (status: $node_ready). Retrying in 5 seconds (attempt $attempt/25)..."
+      sleep 5
+      continue
+    fi
+
+    # Patch tag
     if kubectl patch -n longhorn-system nodes.longhorn.io "$node" \
       --type=merge \
       -p '{"spec": {"tags": ["longhorn-true"]}}'; then
       echo "✔️  Tagged $node successfully."
       break
     else
-      echo "⏳ Patch for node $node failed. Retrying in 5 seconds (attempt $attempt/10)..."
+      echo "⚠️  Patch for $node failed. Retrying in 5 seconds (attempt $attempt/25)..."
       sleep 5
     fi
   done
 done
+
 
 echo "Longhorn node tags applied."
 
