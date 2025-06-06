@@ -60,6 +60,9 @@ for cmd in jq hcl2json; do
 done
 echo "All required commands (jq, hcl2json) are installed."
 
+# Ensure backup_id folder is created
+mkdir -p ./scripts/backup_id
+
 ########################################
 # Common variables
 ########################################
