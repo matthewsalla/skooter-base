@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ .Release.Name }}
+    {{- include "onlyoffice.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}
+    spec:
+      securityContext:
+        fsGroup: {{ .Values.onlyoffice.podSecurityContext.fsGroup }}
+      initContainers:
+        - name: fix-cache-perms
+          image: busybox:1.35
+          command:
+            - sh
+            - -c
+            - chown -R 101:101 /mnt/files
+          securityContext:
+            runAsUser: 0
+          volumeMounts:
+            - name: ds-files
+              mountPath: /mnt/files
+      containers:
+      - name: documentserver
+        image: {{ .Values.onlyoffice.image.repository }}:{{ .Values.onlyoffice.image.tag }}
+        imagePullPolicy: {{ .Values.onlyoffice.image.pullPolicy }}
+        ports:
+          - containerPort: 80
+        env:
+          # PostgreSQL configuration
+          - name: DB_TYPE
+            value: "{{ .Values.onlyoffice.env.DB_TYPE }}"
+          - name: DB_HOST
+            value: "{{ .Values.onlyoffice.env.DB_HOST }}"
+          - name: DB_PORT
+            value: "{{ .Values.onlyoffice.env.DB_PORT }}"
+          - name: DB_NAME
+            value: "{{ .Values.onlyoffice.env.DB_NAME }}"
+          - name: DB_USER
+            value: "{{ .Values.onlyoffice.env.DB_USER }}"
+          - name: DB_PWD
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.onlyoffice.env.DB_PWD.existingSecret }}
+                key: {{ .Values.onlyoffice.env.DB_PWD.secretKey }}
+          
+          # Redis configuration
+          - name: REDIS_SERVER_HOST
+            value: "{{ .Values.onlyoffice.env.REDIS_SERVER_HOST }}"
+          - name: REDIS_SERVER_PORT
+            value: "{{ .Values.onlyoffice.env.REDIS_SERVER_PORT }}"
+          - name: REDIS_SERVER_DB_NUM
+            value: "{{ .Values.onlyoffice.env.REDIS_SERVER_DB_NUM }}"
+          
+          # RabbitMQ configuration
+          - name: AMQP_URI
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.onlyoffice.env.AMQP_URI.existingSecret }}
+                key: {{ .Values.onlyoffice.env.AMQP_URI.secretKey }}
+          
+          # JWT configuration
+          - name: JWT_ENABLED
+            value: "{{ .Values.onlyoffice.jwt.enabled }}"
+          - name: JWT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.onlyoffice.jwt.existingSecret }}
+                key: {{ .Values.onlyoffice.jwt.secretKey }}
+        volumeMounts:
+          - name: ds-files
+            mountPath: /var/www/onlyoffice/Data
+      volumes:
+        - name: ds-files
+          persistentVolumeClaim:
+            claimName: {{ .Values.onlyoffice.persistence.existingClaim }} 

@@ -1,0 +1,72 @@
+# IngressRoute configuration
+ingressroute:
+  enabled: true
+  host: "onlyoffice.example.com"
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: "websecure"
+    traefik.ingress.kubernetes.io/router.tls: "true"
+  tls:
+    secretName: "onlyoffice-tls"
+
+# Certificate configuration
+certificate:
+  enabled: true
+  name: onlyoffice-tls
+  secretName: onlyoffice-tls
+  issuer:
+    name: "letsencrypt-staging"
+    kind: ClusterIssuer
+  dnsNames:
+    - onlyoffice.example.com
+
+# OnlyOffice Community Edition configuration
+onlyoffice:
+  enabled: true
+  
+  # Community Edition image configuration
+  image:
+    repository: onlyoffice/documentserver
+    tag: "8.2.3"
+    pullPolicy: IfNotPresent
+
+  # Service configuration
+  service:
+    type: ClusterIP
+    port: 80
+
+  # Environment variables for database, Redis, and RabbitMQ
+  env:
+    DB_TYPE: "postgres"
+    DB_HOST: "onlyoffice-backend-postgresql"
+    DB_PORT: "5432"
+    DB_NAME: "onlyoffice"
+    DB_USER: "onlyoffice"
+    DB_PWD:
+      existingSecret: onlyoffice-creds
+      secretKey: postgres-password
+
+    REDIS_SERVER_HOST: "onlyoffice-backend-redis-master"
+    REDIS_SERVER_PORT: "6379"
+    REDIS_SERVER_DB_NUM: "0"
+
+    AMQP_URI:
+      existingSecret: onlyoffice-creds
+      secretKey: amqp-uri
+
+  # Persistence configuration
+  persistence:
+    existingClaim: onlyoffice-files-pvc
+
+  # Security context
+  podSecurityContext:
+    fsGroup: 101
+
+  # JWT configuration
+  jwt:
+    enabled: true
+    existingSecret: onlyoffice-creds
+    secretKey: JWT_SECRET
+
+  # Disable default ingress
+  ingress:
+    enabled: false
