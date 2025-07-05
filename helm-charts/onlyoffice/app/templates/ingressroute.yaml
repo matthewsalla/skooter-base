@@ -18,7 +18,7 @@ spec:
         - name: onlyoffice-secure-headers
           namespace: nextcloud
       services:
-        - name: documentserver
+        - name: {{ .Release.Name }}
           port: {{ .Values.onlyoffice.service.port }}
   tls:
     secretName: {{ .Values.ingressroute.tls.secretName }}
