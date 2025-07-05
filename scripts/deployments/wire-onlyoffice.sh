@@ -12,11 +12,11 @@ fi
 # === CONFIG ===
 NS="${NEXTCLOUD_NAMESPACE:-nextcloud}"
 NEXTCLOUD_LABEL="${NEXTCLOUD_LABEL:-app.kubernetes.io/name=nextcloud}"
-ONLYOFFICE_LABEL="${ONLYOFFICE_LABEL:-app=docservice}"
+ONLYOFFICE_LABEL="${ONLYOFFICE_LABEL:-app=onlyoffice}"
 ONLYOFFICE_SECRET="${ONLYOFFICE_SECRET:-onlyoffice-creds}"
 
 PUBLIC_URL="${ONLYOFFICE_PUBLIC_URL:-https://onlyoffice.example.com}"
-INTERNAL_URL="${ONLYOFFICE_INTERNAL_URL:-http://documentserver}"
+INTERNAL_URL="${ONLYOFFICE_INTERNAL_URL:-http://onlyoffice}"
 STORAGE_URL="${NEXTCLOUD_STORAGE_URL:-http://nextcloud:8080}"
 
 POD=$(kubectl get pod -n "$NS" -l "$NEXTCLOUD_LABEL" -o jsonpath='{.items[0].metadata.name}')
