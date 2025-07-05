@@ -40,12 +40,23 @@ wait_for_ready "$NEXTCLOUD_LABEL" "Nextcloud"
 wait_for_ready "$ONLYOFFICE_LABEL" "OnlyOffice"
 
 # === INSTALL ONLYOFFICE APP ===
-exec_occ app:install onlyoffice || true
-exec_occ app:enable onlyoffice
+echo "📦 Installing OnlyOffice app in Nextcloud..."
+if exec_occ app:install onlyoffice 2>/dev/null; then
+  echo "✅ OnlyOffice app installed successfully"
+else
+  echo "ℹ️  OnlyOffice app already installed"
+fi
+
+echo "🔧 Enabling OnlyOffice app..."
+if exec_occ app:enable onlyoffice 2>/dev/null; then
+  echo "✅ OnlyOffice app enabled successfully"
+else
+  echo "ℹ️  OnlyOffice app already enabled"
+fi
 
 # === APPLY MINIMAL CONFIG ===
-exec_occ config:app:set onlyoffice DocumentServerUrl --value="$PUBLIC_URL"
-exec_occ config:app:set onlyoffice DocumentServerInternalUrl --value="$INTERNAL_URL"
-exec_occ config:app:set onlyoffice StorageUrl --value="$STORAGE_URL"
-exec_occ config:app:set onlyoffice jwt_secret --value="$JWT_SECRET" >/dev/null 2>&1
-#exec_occ config:app:set onlyoffice jwt_secret --value="$JWT_SECRET"
+echo "⚙️  Configuring OnlyOffice settings..."
+exec_occ config:app:set onlyoffice DocumentServerUrl --value="$PUBLIC_URL" || echo "ℹ️  DocumentServerUrl already configured"
+exec_occ config:app:set onlyoffice DocumentServerInternalUrl --value="$INTERNAL_URL" || echo "ℹ️  DocumentServerInternalUrl already configured"
+exec_occ config:app:set onlyoffice StorageUrl --value="$STORAGE_URL" || echo "ℹ️  StorageUrl already configured"
+exec_occ config:app:set onlyoffice jwt_secret --value="$JWT_SECRET" >/dev/null 2>&1 || echo "ℹ️  JWT secret already configured"
